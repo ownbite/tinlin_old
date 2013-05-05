@@ -1,0 +1,113 @@
+{% extends "tpl/base.html" %}
+
+{% block nav-home %}
+<li class="active">
+	<a href="/">Hem</a>
+</li>{% endblock %}
+
+{% block content %}
+
+
+<div class="row-fluid">
+	
+	
+	
+	{% if errorlist %}
+	<div class="alert alert-error span12">
+		<button type="button" class="close" data-dismiss="alert">
+			&times;
+		</button>
+		<strong>Error</strong>
+		<ul>
+			{% for errors in errorlist %}
+				<li>{{errors}}</li>
+			{% endfor %}
+		</ul>
+	</div>
+	{% endif %}
+	
+	{% if success %}
+	<div class="alert alert-success span12">
+		<button type="button" class="close" data-dismiss="alert">
+			&times;
+		</button>
+		<strong>{{success}}</strong>
+	</div>
+	
+	{% endif %}
+
+	<form action="/addbill" method="post" class="span12">
+		{% csrf_token %}
+		
+		
+		<input type="text" name="money" value="" placeholder="Summa" class="input-block-level" />
+		<input type="hidden" name="group" value="{{group_list.0.id}}" />
+
+		<div class="row-fluid">
+
+			<select name="category" class="btn-block span8">
+				{% for category in category_list %}
+				<option name="category" value="{{category.id}}">{{category.category}}</option>
+				{% endfor %}
+			</select>
+
+			<button type="button" class="btn btn-danger span3 pull-right" data-toggle="collapse" data-target="#alternativ">
+				Extra information
+			</button>
+
+		</div>
+
+	
+		<p>
+			<div id="alternativ" class="collapse-alt in" style="position: relative; overflow: hidden; height: 1px;">
+				<input type="text" name="desc" value="" placeholder="Beskrivning" class="input-block-level" />
+				<input type="text" id="demo" placeholder="Datum (Standard {{now_date}})" name="date" value="" class="input-block-level" /> 
+			</div>
+			
+			
+			
+			<!--<input name="demo" id="demo" class="i-txt" />
+
+			<a href="#" id="clear" class="btn btn-blue"><span class="btn-i">Clear</span></a>
+			<a href="#" id="show" class="btn btn-blue"><span class="btn-i">Show</span></a>-->
+			
+		</p>
+		
+		<h5>Vilka ska dela på pengarna</h5>
+		
+		{% for user in users %}
+		<label class="checkbox inline">
+			<input type="checkbox" checked="checked" name="users" id="inlineCheckbox1" value="{{user.id}}" />
+			{{user.first_name}} </label>
+		{% endfor %}
+
+		<br />
+		<br />
+
+		<input type="submit" value="Lägg till" class="btn btn-primary btn-large btn-block" />
+	</form>
+
+</div>
+
+<div class="row-fluid">
+	<h1>Kalkyl</h1>
+
+	<table class="table" style="text-align: left;">
+		<tr>
+			<th width="100" >Namn</th>
+			<th width="100" >Summa</th>
+		</tr>
+		{% for balance_user in balance_user_list %}
+
+		<tr>
+			<td> {{balance_user.first_name}} </td>
+			<td> {{balance_user.user_total_money}}  kr </td>
+		</tr>
+
+		{% endfor %}
+
+	</table>
+
+</div>
+
+{% endblock %}

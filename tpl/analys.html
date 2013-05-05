@@ -1,0 +1,71 @@
+{% extends "tpl/base.html" %}
+
+{% block nav-history %}
+<li class="active">
+	<a href="/analasys">Analys</a>
+</li>{% endblock %}
+
+{% block content %}
+
+<div class="row-fluid">
+	
+	
+	<div class="span5" style="margin:0 0 15px 0;">
+		<h1>Analys</h1>
+		Användare i gruppen:
+		{% if users_in_group %}
+			{% for user in users_in_group %}
+				{% ifequal user.first_name "Linus" %} 
+					<span class="label label-important">{{ user.first_name }}</span> 
+				{% else %} 
+					<span class="label label-info">{{ user.first_name }}</span> 
+				{% endifequal %}
+			{% endfor %}
+		{% endif %}
+	</div>
+	
+	<button type="button" style="margin:0 0 15px 0;" class="btn btn-info span3 pull-right hide_history_info" id="show_history_info">
+		Visa mer info
+	</button>
+	
+		
+	
+	
+	{% if latest_bill_list %}
+	<table class="history table table-condensed" style="text-align: left;">
+		<tr>
+			<th width="100" >Namn</th>
+			<th width="100" >Summa</th>
+			<th width="100" >Kategori</th>
+			<th width="200" >Datum</th>
+		</tr>
+		{% for bill in latest_bill_list %}
+		<tr>
+			<td>{{ bill.user.first_name }}</td>	
+			<td>{{ bill.money }} kr</td>
+			<td>{{ bill.category }} {% if bill.desc %} - ({{ bill.desc }}) {% endif %}</td>
+			<td>{{ bill.pub_date|date:"M d, Y" }}</td>
+		</tr>
+		<tr class="hide hiddeninfo">
+			<td  colspan="3" style="border:none;"> 
+			{% for related_bills in bill.related_bills.all %}
+				{% ifequal related_bills.user.first_name "Linus" %} 
+					<span class="label label-important">{{ related_bills.user.first_name }}</span> 
+				{% else %} 
+					<span class="label label-info">{{ related_bills.user.first_name }}</span> 
+				{% endifequal %}
+			{% endfor %}
+
+			 </td>
+		</tr>
+		{% endfor %}
+	</table>
+	{% else %}
+	<p>
+		Inga summor inlagda.
+	</p>
+	{% endif %}
+
+</div>
+
+{% endblock %}
