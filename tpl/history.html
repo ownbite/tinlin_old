@@ -9,6 +9,16 @@
 
 <div class="row-fluid">
 	
+	{% if success %}
+	<div class="alert alert-success span12">
+		<button type="button" class="close" data-dismiss="alert">
+			&times;
+		</button>
+		<strong>{{success}}</strong>
+	</div>
+	
+	{% endif %}
+	
 	
 	<div class="span5" style="margin:0 0 15px 0;">
 		<h1>Historik</h1>
@@ -37,17 +47,17 @@
 			<th width="100" >Namn</th>
 			<th width="100" >Summa</th>
 			<th width="100" >Kategori</th>
-			<th width="200" >Datum</th>
+			<th class="hidden-phone" width="200" >Datum</th>
 		</tr>
 		{% for bill in latest_bill_list %}
 		<tr>
 			<td>{{ bill.user.first_name }}</td>	
 			<td>{{ bill.money }} kr</td>
 			<td>{{ bill.category }} {% if bill.desc %} - ({{ bill.desc }}) {% endif %}</td>
-			<td>{{ bill.pub_date|date:"M d, Y" }}</td>
+			<td class="hidden-phone">{{ bill.pub_date|date:"M d, Y" }}</td>
 		</tr>
 		<tr class="hide hiddeninfo">
-			<td  colspan="3" style="border:none;"> 
+			<td  colspan="4" style="border:none;"> 
 			{% for related_bills in bill.related_bills.all %}
 				{% ifequal related_bills.user.first_name "Linus" %} 
 					<span class="label label-important">{{ related_bills.user.first_name }}</span> 
@@ -55,7 +65,9 @@
 					<span class="label label-info">{{ related_bills.user.first_name }}</span> 
 				{% endifequal %}
 			{% endfor %}
-
+				
+				<a href="/removebill?id={{ bill.id }}" class="btn btn-mini btn-danger pull-right">Ta bort</a>
+				
 			 </td>
 		</tr>
 		{% endfor %}

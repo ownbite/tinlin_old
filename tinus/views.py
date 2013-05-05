@@ -11,6 +11,8 @@ from collections import defaultdict
 from django.template import RequestContext
 from decimal import *
 
+
+#HELPER FUNCTIONS
 def getdeflist(dictionary, key, default=None):
     if dictionary.has_key(key):
         return dictionary.getlist(key)
@@ -20,7 +22,9 @@ def getsessionlist(dictionary, key, default=None):
     if dictionary.has_key(key):
         return dictionary[key]
     return default
-    
+
+
+
 @login_required
 def index(request):
     
@@ -73,20 +77,23 @@ def history(request):
     
     latest_bill_list = Bill.objects.filter(money__gt=0).order_by('-pub_date')[:25]
     users_in_group = User.objects.filter(groups__pk=1)
+    success = getsessionlist(request.session, 'success', [])
     
     c = {
         'users_in_group' : users_in_group,
         'latest_bill_list': latest_bill_list,
         'logged_in_user': request.user,
+        'success': success,
     }
     
     c.update(csrf(request))
+    request.session['success'] = False
+    request.session['errorlist'] = []
     return render_to_response('tpl/history.html', c)
 
 
 @login_required
-def addbill(request):
-    
+def add_bill(request):
     errorlist = []
     
     try:
@@ -111,8 +118,25 @@ def addbill(request):
 
 
 @login_required
-def removebill(request):
-    return redirect('/')
+def remove_bill(request):
+    
+    errorlist = []
+    
+    try:
+        params = request.GET.copy()
+        removed_bill = str(Bill.objects.get(pk=params['id']))
+        Bill.objects.filter(related_bills=params['id']).delete()
+        Bill.objects.get(pk=params['id']).delete()
+
+    except Exception as inst:
+        errorlist = inst.args
+        request.session['errorlist'] = errorlist
+    
+    if not errorlist:
+        request.session['success'] = removed_bill + " har blivigt borttagen."
+    
+
+    return redirect('/history')
 
 def logout(request):
     auth.logout(request)

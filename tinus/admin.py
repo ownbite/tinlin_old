@@ -2,7 +2,7 @@ from tinus.models import Bill, Category
 from django.contrib import admin
 
 class BillAdmin(admin.ModelAdmin):   
-    list_display = ('category', 'money', 'pub_date')
+    list_display = ('id','category', 'money', 'pub_date')
     
     fieldsets = [
         (None,               {'fields': ['group']}),

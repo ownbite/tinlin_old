@@ -20,10 +20,8 @@ class BillManager(models.Manager):
 class Validate(models.Manager):
     
     def create_bill(self, request):
-        print "asd"
         errorlist = []
         params = request.copy()
-        
         
         # Check if money is not defined
         if not self.is_real(params['money']):
