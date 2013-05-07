@@ -11,7 +11,6 @@ from collections import defaultdict
 from django.template import RequestContext
 from decimal import *
 
-
 #HELPER FUNCTIONS
 def getdeflist(dictionary, key, default=None):
     if dictionary.has_key(key):
@@ -23,21 +22,36 @@ def getsessionlist(dictionary, key, default=None):
         return dictionary[key]
     return default
 
-
-
 @login_required
 def index(request):
-    
     errorlist = getsessionlist(request.session, 'errorlist', [])
     success = getsessionlist(request.session, 'success', [])
+    
+    tpl = getsessionlist(request.session, 'tpl_name', [])
+    c = getsessionlist(request.session, 'tpl_params', [])
+
+    a = {
+         'errorlist': errorlist,
+         'success': success,
+    }
+    
+    c.update(a)
+    c.update(csrf(request))
+       
+    request.session['success'] = False
+    request.session['errorlist'] = []
+    request.session['tpl_params'] = []
+    return render_to_response('tpl/' + tpl, c)
+
+@login_required
+def home(request):
     
     category_list = Category.objects.all()
     group_list = request.user.groups.all() 
     users = User.objects.filter(groups__pk=1)
     balance_user_list = []
     
-    try:
-            
+    try:    
         i = 0
         for u in users:
             user_total_money = 0
@@ -55,23 +69,18 @@ def index(request):
         request.session['errorlist'] = errorlist    
         balance_user_list = {}
     
-   
-    c = {
-        'errorlist': errorlist,
+    request.session['tpl_name'] = "content.html"
+    request.session['tpl_params'] = {
         'group_list': group_list,
         'users':users,
         'balance_user_list': balance_user_list,
         'category_list': category_list,
         'logged_in_user': request.user,
         'now_date': datetime.now().strftime('%Y-%m-%d'),
-        'success': success,
     }
     
-    c.update(csrf(request))
-    request.session['success'] = False
-    request.session['errorlist'] = []
-    return render_to_response('tpl/content.html', c)
-
+    return index(request)   
+    
 @login_required
 def history(request):
     
@@ -79,17 +88,15 @@ def history(request):
     users_in_group = User.objects.filter(groups__pk=1)
     success = getsessionlist(request.session, 'success', [])
     
-    c = {
+    request.session['tpl_name'] = "history.html"
+    request.session['tpl_params'] = {
         'users_in_group' : users_in_group,
         'latest_bill_list': latest_bill_list,
         'logged_in_user': request.user,
         'success': success,
     }
     
-    c.update(csrf(request))
-    request.session['success'] = False
-    request.session['errorlist'] = []
-    return render_to_response('tpl/history.html', c)
+    return index(request)
 
 
 @login_required

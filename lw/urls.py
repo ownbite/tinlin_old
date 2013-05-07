@@ -4,7 +4,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^$', 'tinus.views.index'),
+    url(r'^$', 'tinus.views.home'),
     url(r'^history/$', 'tinus.views.history'),
     url(r'^logout$', 'tinus.views.logout'),
     url(r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'tpl/login.html'}),
