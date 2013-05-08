@@ -1,0 +1,25 @@
+{% extends "tpl/base.html" %}
+
+{% block nav-analysis %}
+<li class="active">
+	<a href="/analysis">Analysis</a>
+</li>{% endblock %}
+
+{% block content %}
+
+<div class="row-fluid">
+	
+	{% if success %}
+	<div class="alert alert-success span12">
+		<button type="button" class="close" data-dismiss="alert">
+			&times;
+		</button>
+		<strong>{{success}}</strong>
+	</div>
+	{% endif %}
+	
+	
+	
+</div>
+
+{% endblock %}

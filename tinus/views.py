@@ -22,7 +22,6 @@ def getsessionlist(dictionary, key, default=None):
         return dictionary[key]
     return default
 
-@login_required
 def index(request):
     errorlist = getsessionlist(request.session, 'errorlist', [])
     success = getsessionlist(request.session, 'success', [])
@@ -89,6 +88,23 @@ def history(request):
     success = getsessionlist(request.session, 'success', [])
     
     request.session['tpl_name'] = "history.html"
+    request.session['tpl_params'] = {
+        'users_in_group' : users_in_group,
+        'latest_bill_list': latest_bill_list,
+        'logged_in_user': request.user,
+        'success': success,
+    }
+    
+    return index(request)
+
+@login_required
+def analysis(request):
+    
+    latest_bill_list = Bill.objects.filter(money__gt=0).order_by('-pub_date')[:25]
+    users_in_group = User.objects.filter(groups__pk=1)
+    success = getsessionlist(request.session, 'success', [])
+    
+    request.session['tpl_name'] = "analysis.html"
     request.session['tpl_params'] = {
         'users_in_group' : users_in_group,
         'latest_bill_list': latest_bill_list,
