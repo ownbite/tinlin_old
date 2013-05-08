@@ -8,11 +8,166 @@
 {% block content %}
 
 <div class="row-fluid">
-	
-	
-	
-	
-	
+	<div class="well span12">
+		<h2>Välj Person</h2>
+
+		<form method="POST" action="/chooseuser">
+			{% csrf_token %}
+			<select class="span8" name="user_id">
+				<option value="0">Everyone</option>
+				{% for user in users_in_group %}
+				<option value="{{user.id}}" {% ifequal user choosen_user %} selected="selected" {% endifequal %} >{{user.first_name}} </option>
+				{% endfor %}
+			</select>
+			<input type="submit" class="btn span3 pull-right" value="Välj person" />
+		</form>
+	</div>
 </div>
+
+<div class="row-fluid">
+
+	<div class="well span12">
+
+		<h2>Totala utgifter</h2>
+
+		<div class="span6">
+			<div id="pie" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+		</div>
+
+		<div class="span5">
+			<table class="table" style="text-align: left;">
+				<tr>
+					<th width="100" >Kategori</th>
+					<th width="100" >Summa</th>
+				</tr>
+				{% for key,value in category_list.items %}
+
+				<tr>
+					<td> {{key}} </td>
+					<td> {{value}}  kr </td>
+				</tr>
+				{% endfor %}
+
+			</table>
+
+		</div>
+	</div>
+</div>
+<div class="row-fluid">
+	<div class="well span12">
+
+		<h2>Månadskostnader</h2>
+
+		<div id="bars" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+		<br />
+		<table class="table" style="text-align: left;">
+			<tr>
+				<th width="100" >Månader</th>
+				<th width="100" >Summa</th>
+			</tr>
+			{% for key,value in months_cost.items %}
+
+			<tr>
+				<td> {{key}} </td>
+				<td> {{value}}  kr </td>
+			</tr>
+			{% endfor %}
+
+		</table>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block script-analysis %}
+
+<script>
+		$(function() {
+	$('#bars').highcharts({
+	chart : {
+	type : 'column'
+	},
+	title : {
+	text : 'Månadskostader'
+	},
+	subtitle : {
+	text : 'Data ifrån: Linus, Tina'
+	},
+	xAxis : {
+	categories :
+	['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+	},
+	yAxis : {
+	min : 0,
+	title : {
+	text : 'Pengar (kr)'
+	}
+	},
+	tooltip : {
+	headerFormat : '<span style="font-size:10px">{point.key}</span><table>',
+	pointFormat : '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' + '<td style="padding:0"><b>{point.y:.1f} kr</b></td></tr>',
+	footerFormat : '</table>',
+	shared : true,
+	useHTML : true
+	},
+	plotOptions : {
+	column : {
+	pointPadding : 0.2,
+	borderWidth : 0
+	}
+	},
+
+	series : [
+	{% for category,array in bill_list.items %}
+	{
+	name : '{{category}}',
+	data : [ {% for value in array %} {{value}}, {% endfor %} ]
+	},
+	{% endfor %}]
+	});
+	});
+
+	$(function () {
+	$('#pie').highcharts({
+	chart: {
+	plotBackgroundColor: null,
+	plotBorderWidth: null,
+	plotShadow: false
+	},
+	title: {
+	text: 'Totala utgifter'
+	},
+	subtitle : {
+	text : 'Data ifrån: Linus, Tina'
+	},
+	tooltip: {
+	pointFormat: '{series.name}: <b>{point.percentage}kr</b>',
+	percentageDecimals: 2
+	},
+	plotOptions: {
+	pie: {
+	allowPointSelect: true,
+	cursor: 'pointer',
+	dataLabels: {
+	enabled: true,
+	color: '#000000',
+	connectorColor: '#000000',
+	formatter: function() {
+	return '<span><b>'+ this.point.name +'</b>: '+ Math.round(this.percentage) +' %';
+	}
+	}
+	}
+	},
+	series: [{
+	type: 'pie',
+	name: 'Browser share',
+	data: [
+	{% for key,value in category_list.items %}
+	['{{key}}',{{value}}],
+	{% endfor %}
+	]
+	}]
+	});
+	});</script>
 
 {% endblock %}

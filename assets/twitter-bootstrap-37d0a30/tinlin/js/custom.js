@@ -1,4 +1,5 @@
 
+
 jQuery(document).ready(function($) {
 	$(".collapse-alt").collapse();
 
@@ -19,7 +20,5 @@ jQuery(document).ready(function($) {
 			$(this).addClass('hide_history_info');
 		}
 	});
-
-	$('#demo').scroller('setDate', now, true);
 
 });
