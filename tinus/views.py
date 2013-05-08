@@ -22,35 +22,45 @@ def getsessionlist(dictionary, key, default=None):
         return dictionary[key]
     return default
 
-def index(request):
-    errorlist = getsessionlist(request.session, 'errorlist', [])
-    success = getsessionlist(request.session, 'success', [])
-    
-    tpl = getsessionlist(request.session, 'tpl_name', [])
-    c = getsessionlist(request.session, 'tpl_params', [])
+def init(func):
+    def _wrap(request, *args, **kwargs):  
+        
+        
+        
+        # Execute the function with arguments
+        c = func(request, *args, **kwargs) 
+        
+        # Get the success and errormessages
+        errorlist = getsessionlist(request.session, 'errorlist', [])
+        success = getsessionlist(request.session, 'success', [])
+        
+        a = {
+             'errorlist' : errorlist,
+             'success' : success,
+        }
 
-    a = {
-         'errorlist': errorlist,
-         'success': success,
-    }
+        c.update(a)
+        c.update(csrf(request)) 
+        
+        # Resets the errorlist and successlist
+        request.session['errorlist'] = []
+        request.session['success'] = []
+        
+        return render_to_response('tpl/' + c['tpl'], c)
     
-    c.update(a)
-    c.update(csrf(request))
-       
-    request.session['success'] = False
-    request.session['errorlist'] = []
-    request.session['tpl_params'] = []
-    return render_to_response('tpl/' + tpl, c)
+    return _wrap
+
 
 @login_required
+@init
 def home(request):
     
-    category_list = Category.objects.all()
-    group_list = request.user.groups.all() 
-    users = User.objects.filter(groups__pk=1)
-    balance_user_list = []
-    
-    try:    
+    try:
+        category_list = Category.objects.all()
+        group_list = request.user.groups.all() 
+        users = User.objects.filter(groups__pk=1)
+        balance_user_list = []
+            
         i = 0
         for u in users:
             user_total_money = 0
@@ -64,12 +74,12 @@ def home(request):
             balance_user_list.append(balance_user)
             
     except Exception as inst:
-        errorlist = inst.args
-        request.session['errorlist'] = errorlist    
+        errorlist = inst.args 
+        request.session['errorlist'] = errorlist
         balance_user_list = {}
     
-    request.session['tpl_name'] = "content.html"
-    request.session['tpl_params'] = {
+    c = {
+        'tpl': 'content.html',  
         'group_list': group_list,
         'users':users,
         'balance_user_list': balance_user_list,
@@ -78,41 +88,37 @@ def home(request):
         'now_date': datetime.now().strftime('%Y-%m-%d'),
     }
     
-    return index(request)   
+    return c   
     
 @login_required
+@init
 def history(request):
-    
     latest_bill_list = Bill.objects.filter(money__gt=0).order_by('-pub_date')[:25]
     users_in_group = User.objects.filter(groups__pk=1)
-    success = getsessionlist(request.session, 'success', [])
     
-    request.session['tpl_name'] = "history.html"
-    request.session['tpl_params'] = {
+    c = {
+        'tpl': 'history.html',
         'users_in_group' : users_in_group,
         'latest_bill_list': latest_bill_list,
         'logged_in_user': request.user,
-        'success': success,
     }
     
-    return index(request)
+    return c
 
 @login_required
+@init
 def analysis(request):
-    
     latest_bill_list = Bill.objects.filter(money__gt=0).order_by('-pub_date')[:25]
     users_in_group = User.objects.filter(groups__pk=1)
-    success = getsessionlist(request.session, 'success', [])
     
-    request.session['tpl_name'] = "analysis.html"
-    request.session['tpl_params'] = {
+    c = {
+        'tpl' : 'analysis.html',                             
         'users_in_group' : users_in_group,
         'latest_bill_list': latest_bill_list,
         'logged_in_user': request.user,
-        'success': success,
     }
     
-    return index(request)
+    return c
 
 
 @login_required
@@ -142,7 +148,6 @@ def add_bill(request):
 
 @login_required
 def remove_bill(request):
-    
     errorlist = []
     
     try:

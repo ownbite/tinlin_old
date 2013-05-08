@@ -9,29 +9,7 @@
 
 <div class="row-fluid">
 
-	{% if errorlist %}
-	<div class="alert alert-error span12">
-		<button type="button" class="close" data-dismiss="alert">
-			&times;
-		</button>
-		<strong>Error</strong>
-		<ul>
-			{% for errors in errorlist %}
-				<li>{{errors}}</li>
-			{% endfor %}
-		</ul>
-	</div>
-	{% endif %}
 	
-	{% if success %}
-	<div class="alert alert-success span12">
-		<button type="button" class="close" data-dismiss="alert">
-			&times;
-		</button>
-		<strong>{{success}}</strong>
-	</div>
-	
-	{% endif %}
 
 	<form action="/addbill" method="post" class="span12">
 		{% csrf_token %}

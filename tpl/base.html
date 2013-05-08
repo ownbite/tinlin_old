@@ -11,7 +11,7 @@
 		<link href="{% static "css/bootstrap.css" %}" rel="stylesheet">
 		<style>
 			body {
-				padding-top: 60px; 
+				padding-top: 60px;
 			}
 		</style>
 		<link href="{% static "css/bootstrap-responsive.css" %}" rel="stylesheet">
@@ -44,7 +44,7 @@
 								<a href="/analysis">Analysis</a>
 							</li>
 							{% endblock %}
-							
+
 							<li class="nav-header hidden-desktop">
 								Inställningar
 							</li>
@@ -59,44 +59,76 @@
 		{% endblock %}
 
 		<div class="container">
+			{% if errorlist %}
+			<div class="row-fluid">
+				<div class="alert alert-error span12">
+					<button type="button" class="close" data-dismiss="alert">
+						&times;
+					</button>
+					<strong>Error</strong>
+					<ul>
+						{% for errors in errorlist %}
+						<li>
+							{{errors}}
+						</li>
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if success %}
+			<div class="row-fluid">
+				<div class="alert alert-success span12">
+					<button type="button" class="close" data-dismiss="alert">
+						&times;
+					</button>
+					<strong>{{success}}</strong>
+				</div>
+			</div>
+
+			{% endif %}
+
 			{% block content %}
 			{% endblock %}
 		</div>
-		
+
 		<!-- Le javascript
 		================================================== -->
-		<!-- Placed at the end of the document so the pages load faster -->
-		<script src="http://code.jquery.com/jquery-latest.js"></script>
+		<!-- Placed at the end of the document so the pages load faster 
+		
 		<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
-		<!-- <script src="{% static "js/jquery.js" %}"></script> -->
+		<!-- <script src="{% static "js/jquery.js" %}"></script> 
+			<script src="{% static "js/jquery.js" %}"></script> 
 		<script src="{% static "js/bootstrap.js" %}"></script>
-		<script src="{% static "js/mobiscroll-2.3.1.custom.min.js" %}"></script>
+		<script src="{% static "js/mobiscroll-2.3.1.custom.min.js" %}"></script>-->
+		
+		<script src="http://code.jquery.com/jquery-latest.js"></script>
+		<script src="{% static "js/main.js" %}"></script>
 		<script>
 			jQuery(document).ready(function($) {
 				$(".collapse-alt").collapse();
-				
+
 				$('#demo').mobiscroll().date({
 					theme : 'jqm',
 					display : 'bubble',
 					mode : 'scroller',
-					dateOrder: 'ddMyyyy',
-                    dateFormat: 'yyyy-mm-dd',
+					dateOrder : 'ddMyyyy',
+					dateFormat : 'yyyy-mm-dd',
 				});
-				
-				$('#show_history_info').click(function(){
-					if($(this).hasClass('hide_history_info')) {
+
+				$('#show_history_info').click(function() {
+					if ($(this).hasClass('hide_history_info')) {
 						$('.history .hiddeninfo').removeClass('hide');
 						$(this).removeClass('hide_history_info');
-					}
-					else {
+					} else {
 						$('.history .hiddeninfo').addClass('hide');
 						$(this).addClass('hide_history_info');
 					}
 				});
-				
+
 				$('#demo').scroller('setDate', now, true);
-				
-				
+
 			});
 		</script>
 
